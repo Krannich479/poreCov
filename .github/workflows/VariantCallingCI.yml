@@ -56,7 +56,11 @@ jobs:
   
       - name: Run poreCov
         run: |
-          conda install -c conda-forge singularity
-          NXF_VER=23.07.0 nextflow run poreCov.nf --fastq cieved/fastqs/*.fastq -profile local,singularity --cores 2 --max_cores 4
+          conda deactivate
+          conda create -n porecov -c conda-forge singularity
+          conda activate porecov
+          curl -s https://get.nextflow.io | bash
+          chmod +x nextflow
+          NXF_VER=23.07.0 ./nextflow run poreCov.nf --fastq cieved/fastqs/*.fastq -profile local,singularity --cores 2 --max_cores 4
           tree results
 
