@@ -1,0 +1,47 @@
+name: VariantCallingCI
+
+on:
+  push:
+    branches: ["main", "dev"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  VariantCallingCI:
+    name: VariantCallingCI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniconda-version: "latest"
+          channels: bioconda,conda-forge,defaults
+          channel-priority: true
+          auto-activate-base: true
+
+      - name: Check conda installation
+        run: |
+          conda info
+
+      - name: Install nextflow
+        run: |
+          conda install -c bioconda nextflow
+          nextflow -version
+
+      - name: Git checkout CIEVaD + REF
+        run: |
+          git clone https://github.com/rki-mf1/cievad.git
+          pushd cievad
+          cp ../data/reference_nCov19/NC_045512.2.fasta .
+          sed -i 's/>NC_045512.2 Severe acute respiratory syndrome coronavirus 2 isolate Wuhan-Hu-1, complete genome/>NC_045512.2/g' NC_045512.2.fasta
+          popd
+
+      - name: Run CIEVaD hap
+        run: |
+          pushd cievad
+          nextflow run hap.nf -profile local,conda --reference NC_045512.2.fasta --read_type ont
+          ls -la results/
+          popd
