@@ -20,7 +20,7 @@ jobs:
           miniconda-version: "latest"
           channels: bioconda,conda-forge,defaults
           channel-priority: true
-          auto-activate-base: false
+          auto-activate-base: true
 
       - name: Check conda installation
         run: |
@@ -28,8 +28,7 @@ jobs:
 
       - name: Install nextflow
         run: |
-          conda env create --yes -n nextflow -c bioconda nextflow
-          conda activate nextflow
+          conda install -c bioconda nextflow
           nextflow -version
       
       - name: Checkout CIEVaD
