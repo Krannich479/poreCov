@@ -25,20 +25,23 @@ jobs:
       - name: Check conda installation
         run: |
           conda info
+
+      - name: Install nextflow
+        run: |
+          conda env create --yes -n nextflow -c bioconda nextflow
+          conda activate nextflow
+          nextflow -version
       
       - name: Checkout CIEVaD
         uses: actions/checkout@v4
         with:
           repository: rki-mf1/cievad
           path: cievad
+          ref: dev
 
       - name: Activate NF, get REF, run hap
         run: |
           pushd cievad
-          conda env create --yes -f env/conda_nxf.yml
-          conda activate nextflow
-          conda install -c conda-forge numpy=1.17.2 scikit-learn=0.21.3
-          nextflow -version
           cp ../data/reference_nCov19/NC_045512.2.fasta .
           sed -i 's/>NC_045512.2 Severe acute respiratory syndrome coronavirus 2 isolate Wuhan-Hu-1, complete genome/>NC_045512.2/g' NC_045512.2.fasta
           nextflow run hap.nf -profile local,conda --reference NC_045512.2.fasta --read_type ont
