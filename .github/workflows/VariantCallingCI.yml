@@ -38,7 +38,7 @@ jobs:
           path: cievad
           ref: dev
 
-      - name: Activate NF, get REF, run hap
+      - name: Run CIEVaD hap
         run: |
           pushd cievad
           cp ../data/reference_nCov19/NC_045512.2.fasta .
@@ -46,3 +46,17 @@ jobs:
           nextflow run hap.nf -profile local,conda --reference NC_045512.2.fasta --read_type ont
           ls -la results/
           popd
+
+      - name: Prep folder for poreCov
+        run: |
+          pushd cievad
+          mkdir fastqs
+          mv results/*.fastq fastqs/
+          popd
+  
+      - name: Run poreCov
+        run: |
+          conda install -c conda-forge singularity
+          NXF_VER=23.07.0 nextflow run poreCov.nf --fastq cieved/fastqs/*.fastq -profile local,singularity --cores 2 --max_cores 4
+          tree results
+
