@@ -35,7 +35,7 @@ jobs:
       - name: Activate NF, get REF, run hap
         run: |
           pushd cievad
-          conda create -y --file env/conda_nxf.yml
+          conda create -y --file env/conda_nxf.yml -n nextflow
           conda activate nextflow
           nextflow -version
           cp ../data/reference_nCov19/NC_045512.2.fasta .
